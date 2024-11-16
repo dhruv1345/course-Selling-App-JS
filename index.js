@@ -1,10 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
+
+require('dotenv').config();
+
 const { userRouter } = require("./routes/user.js");
 const { courseRouter } = require("./routes/course.js");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/course", courseRouter);
@@ -12,7 +15,7 @@ app.use("/api/v1/course", courseRouter);
 const startServer = async () => {
     try {
         await mongoose.connect(
-            "mongodb+srv://dhruvguptaalgo:jyoti%4012@fullstack.rsnr9.mongodb.net/course-by-DG?retryWrites=true&w=majority"
+            process.env.DB_CONNECTION_STRING
         );
         console.log("Connected to MongoDB");
 

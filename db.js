@@ -3,7 +3,7 @@ const { Schema, Types } = mongoose;
 
 // Connect to MongoDB
 mongoose.connect(
-  "mongodb+srv://dhruvguptaalgo:jyoti%4012@fullstack.rsnr9.mongodb.net/course-by-DG?retryWrites=true&w=majority"
+    process.env.DB_CONNECTION_STRING
 );
 
 // Check connection status
