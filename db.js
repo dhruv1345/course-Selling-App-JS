@@ -16,12 +16,13 @@ mongoose.connection.on("error", (err) => {
 });
 
 // Define Schemas
-const userSchema = new Schema({
-  email: { type: String, unique: true, required: true },
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  FirstName: { type: String, required: true },
-  LastName: { type: String, required: true },
+  firstName: { type: String, required: true }, // Change FirstName to firstName
+  lastName: { type: String, required: true },  // Change LastName to lastName
 });
+
 
 const adminSchema = new Schema({
   email: { type: String, unique: true, required: true },
