@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_ADMIN_PASSWORD } = require("../config");
 const { adminMiddleware } = require("../middleware/admin");
 
+// Validation schema for admin signup
 const adminSignupSchema = z.object({
     email: z.string().email("Enter correct email id"),
     password: z.string().min(6, "Enter at least 6 characters"),
@@ -14,6 +15,7 @@ const adminSignupSchema = z.object({
     LastName: z.string().min(1, "Enter last name"),
 });
 
+// Admin signup
 adminRouter.post("/signup", async function (req, res) {
     try {
         const mappedAdminData = {
@@ -27,13 +29,13 @@ adminRouter.post("/signup", async function (req, res) {
         const { email, password, FirstName, LastName } = validatedAdminData;
 
         // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);  // Await hash
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newAdmin = await adminModel.create({
-            email: email,
+            email,
             password: hashedPassword,
-            FirstName: FirstName,
-            LastName: LastName,
+            FirstName,
+            LastName,
         });
 
         res.json({
@@ -54,13 +56,12 @@ adminRouter.post("/signup", async function (req, res) {
     }
 });
 
+// Admin signin
 adminRouter.post("/signin", async function (req, res) {
     const { email, password } = req.body;
 
     try {
-        const admin = await adminModel.findOne({
-            email,
-        });
+        const admin = await adminModel.findOne({ email });
 
         if (!admin) {
             return res.status(403).json({
@@ -80,7 +81,7 @@ adminRouter.post("/signin", async function (req, res) {
 
         res.json({
             message: "Signin successful",
-            token: token,
+            token,
         });
     } catch (error) {
         console.error("Signin error:", error.message);
@@ -90,38 +91,83 @@ adminRouter.post("/signin", async function (req, res) {
     }
 });
 
-adminRouter.post("/course",adminMiddleware, async function (req, res) {
-    
-    const adminId = req.userId;
+// Create a course
+adminRouter.post("/course", adminMiddleware, async function (req, res) {
+    try {
+        const adminId = req.userId;
+        const { title, description, imageUrl, price } = req.body;
 
-    const {
-        title,description,imageUrl, price
-    } = req.body;
+        const course = await courseModel.create({
+            title,
+            description,
+            imageUrl,
+            price,
+            creatorId: adminId,
+        });
 
-    const course = await courseModel.create({
-        title,description,imageUrl,price,creatorId:adminId
-    })
-
-    res.json({
-        message: "Course creation done",
-        courseId :  course._id
-    });
+        res.json({
+            message: "Course creation done",
+            courseId: course._id,
+        });
+    } catch (error) {
+        console.error("Course creation error:", error.message);
+        res.status(500).json({
+            message: "Internal server error",
+        });
+    }
 });
 
-adminRouter.put("/course", function (req, res) {
-    // Implement course update logic here
-    res.json({
-        message: "Course update endpoint",
-    });
+// Update a course
+adminRouter.put("/course/:id", adminMiddleware, async function (req, res) {
+    try {
+        const { id } = req.params;
+        const { title, description, imageUrl, price } = req.body;
+
+        const updatedCourse = await courseModel.findByIdAndUpdate(
+            id,
+            { title, description, imageUrl, price },
+            { new: true }
+        );
+
+        if (!updatedCourse) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        res.json({
+            message: "Course updated successfully",
+            updatedCourse,
+        });
+    } catch (error) {
+        console.error("Course update error:", error.message);
+        res.status(500).json({
+            message: "Internal server error",
+        });
+    }
 });
 
-adminRouter.get("/course/bulk", function (req, res) {
-    // Implement bulk course fetch logic here
-    res.json({
-        message: "Bulk course fetch endpoint",
-    });
+// Bulk fetch courses
+adminRouter.get("/course/bulk", adminMiddleware, async function (req, res) {
+    try {
+        const courses = await courseModel.find();
+
+        if (!courses.length) {
+            return res.status(404).json({
+                message: "No courses found",
+            });
+        }
+
+        res.json({
+            message: "Courses fetched successfully",
+            courses,
+        });
+    } catch (error) {
+        console.error("Bulk fetch error:", error.message);
+        res.status(500).json({
+            message: "Internal server error",
+        });
+    }
 });
 
 module.exports = {
-    adminRouter: adminRouter,
+    adminRouter,
 };
