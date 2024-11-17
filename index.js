@@ -5,12 +5,14 @@ require('dotenv').config();
 
 const { userRouter } = require("./routes/user.js");
 const { courseRouter } = require("./routes/course.js");
+const { adminRouter } = require("./routes/admin.js");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/course", courseRouter);
+app.use("/api/v1/admin", adminRouter);
 
 const startServer = async () => {
     try {
