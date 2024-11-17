@@ -5,7 +5,7 @@ const { userModel } = require("../db");
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const JWT_USER_PASSWORD = "DGJS1320"; // Replace with an actual secret in production
+const {JWT_USER_PASSWORD} = require("../config"); // Replace with an actual secret in production
 
 // Define Zod schema for validation
 const signupSchema = z.object({

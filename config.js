@@ -1,0 +1,7 @@
+const JWT_USER_PASSWORD = "DGJS1320";
+const JWT_ADMIN_PASSWORD = "JSDG2013";
+
+module.exports={
+    JWT_USER_PASSWORD,
+    JWT_ADMIN_PASSWORD
+}
