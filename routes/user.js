@@ -1,7 +1,7 @@
 const express = require("express");
 const Router = express.Router;
 const userRouter = Router();
-const { userModel } = require("../db");
+const { userModel, purchaseModel } = require("../db");
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -105,9 +105,17 @@ userRouter.post("/signin", async function (req, res) {
 });
 
 // Purchases route (for demonstration)
-userRouter.get("/purchases", function (req, res) {
+userRouter.get("/purchases",async function (req, res) {
+    const userId = req.userId;
+
+    const purchases = await purchaseModel.find({
+        userId,
+        courseId
+    })
+
     res.json({
         message: "Purchases endpoint",
+        purchases
     });
 });
 
